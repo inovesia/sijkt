@@ -120,6 +120,10 @@ app.get('/sijkt-callback', (req, res, next) => {
                             // map userId to user_sijkt
                             exec('UPDATE master_user SET user_sijkt=? WHERE user_email=?', [response.payload.userId, response.payload.userEmail])
                             .then((response) => {
+                                // grant user to app
+                                get("User", "grant", `token=${base64.decode(req.query.t)}`)
+                                .then((response) => {
+                                });
                                 // start a new session
                                 exec('INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())', [user.user_id, session.id])
                                 .then((response) => {
