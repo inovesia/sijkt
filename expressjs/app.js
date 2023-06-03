@@ -10,7 +10,7 @@ const SIJKT_URL = "https://sijkt.inovesia.co.id/api";
 
 const MYSQL = {
     host: "HOST",
-    user: "USER",
+    user: "USERNAME",
     password: "PASSWORD",
     database: "DATABASE"
 }
@@ -90,6 +90,8 @@ app.post('/login', (req, res, next) => {
             .then((response) => {
                 res.redirect('/');     
             });
+        } else {
+            res.send('Access denied, <a href="/login">login</a>');
         }
     });
   })
@@ -99,7 +101,6 @@ app.get('/sijkt-callback', (req, res, next) => {
     get("User", "token", `token=${base64.decode(req.query.t)}`)
     .then((response) => {
         response = JSON.parse(response);
-        console.log(response);
         if (response.errorCode == 0) {
             // check if userId is mapped to table master_user column user_sijkt
             query('SELECT * FROM master_user WHERE user_sijkt=?', [response.payload.userId])
