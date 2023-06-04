@@ -1,6 +1,6 @@
-# SIJKT ExpressJS Example
+# SIJKT PHP Example
 
-This sample code require node.js 16
+This sample code require php 7
 
 ### db.php
 ```
