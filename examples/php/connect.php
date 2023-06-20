@@ -13,6 +13,8 @@ if (count($_POST) == 0) {
 } else {
     $rows = dbQuery("SELECT * FROM master_user WHERE user_email=? AND user_password=MD5(?)", [$_POST["username"],$_POST["password"]]);
     if (count($rows) > 0) {
+        // grant access
+        get("User", "grant", "token=".base64_decode($_POST['token']));
         // map user
         dbExec("UPDATE master_user SET user_sijkt=? WHERE user_id=?", [$_POST["accountId"], $rows[0]["user_id"]]);
         // start a new session

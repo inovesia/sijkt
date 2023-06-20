@@ -1,4 +1,5 @@
 <?php
+const SIJKT_URL = "https://sijkt.inovesia.co.id/api";
 
 function dbConnect() {
     $host = 'HOST';
@@ -35,4 +36,24 @@ function dbExec($sql, $params) {
     $stmt->execute($params);
     $pdo = null;
     return $stmt->fetchAll();
+}
+
+function get($module, $action, $query) {
+    $ch = curl_init();
+    $headers = array(
+    'Accept: application/json',
+    'Content-Type: application/json',
+
+    );
+    curl_setopt($ch, CURLOPT_URL, SIJKT_URL."/$module/$action?$query");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET"); 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+    // Timeout in seconds
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
+    return curl_exec($ch);
 }

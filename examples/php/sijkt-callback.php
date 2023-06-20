@@ -1,29 +1,7 @@
 <?php
 session_start();
 
-const SIJKT_URL = "https://sijkt.inovesia.co.id/api";
-
 require_once ('db.php');
-
-function get($module, $action, $query) {
-    $ch = curl_init();
-    $headers = array(
-    'Accept: application/json',
-    'Content-Type: application/json',
-
-    );
-    curl_setopt($ch, CURLOPT_URL, SIJKT_URL."/$module/$action?$query");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET"); 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-
-    // Timeout in seconds
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
-    return curl_exec($ch);
-}
 
 $response = json_decode(get("User", "token", "token=".base64_decode($_GET['t'])), true);
 if ($response["errorCode"] == 0) {
@@ -44,7 +22,7 @@ if ($response["errorCode"] == 0) {
             header('Location: /');
         } else {        
             // echo 'Access denied, <a href="/login.php">login</a>';
-            echo 'Access denied, <a href="/connect.php?accountId='.$response["payload"]["userId"].'">connect</a>';
+            echo 'Access denied, <a href="/connect.php?accountId='.$response["payload"]["userId"].'&token='.$_GET['t'].'">connect</a>';
         }
     }
 } else {        
