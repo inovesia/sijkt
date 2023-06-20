@@ -16,11 +16,14 @@ function get($module, $action, $query) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET"); 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
     // Timeout in seconds
     curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
     return curl_exec($ch);
 }
-
 
 $response = json_decode(get("User", "token", "token=".base64_decode($_GET['t'])), true);
 if ($response["errorCode"] == 0) {
@@ -40,7 +43,8 @@ if ($response["errorCode"] == 0) {
             dbExec("INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())", [$rows[0]["user_id"], session_id()]);
             header('Location: /');
         } else {        
-            echo 'Access denied, <a href="/login.php">login</a>';
+            // echo 'Access denied, <a href="/login.php">login</a>';
+            echo 'Access denied, <a href="/connect.php?accountId='.$response["payload"]["userId"].'">connect</a>';
         }
     }
 } else {        
