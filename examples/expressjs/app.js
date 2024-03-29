@@ -3,17 +3,9 @@ const base64 = require('base-64');
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const mysql = require('mysql2/promise');
-const app = express()
-const port = 3000
-
-const SIJKT_URL = "https://sijkt.inovesia.co.id/api";
-
-const MYSQL = {
-    host: "HOST",
-    user: "USERNAME",
-    password: "PASSWORD",
-    database: "DATABASE"
-}
+const common = require('./js/common.js');
+const app = express();
+const port = 3000;
 
 app.use('/html', express.static('html'))
 app.use('/js', express.static('js'))
@@ -32,19 +24,19 @@ app.use(sessions({
 }));
 
 let query = async (sql, params) => {
-    const connection = await mysql.createConnection(MYSQL);
+    const connection = await mysql.createConnection(common.MYSQL);
     const [results, ] = await connection.execute(sql, params);
     return results;
 }
 
 let exec = async (sql, params) => {
-    const connection = await mysql.createConnection(MYSQL);
+    const connection = await mysql.createConnection(common.MYSQL);
     const [results, ] = await connection.execute(sql, params);
     return results;
 }
 
 let get = async (module, action, query) => {
-    return fetch(`${SIJKT_URL}/${module}/${action}${query ? `?${query}` : ''}`)
+    return fetch(`${common.SIJKT_API_URL}/${module}/${action}${query ? `?${query}` : ''}`)
     .then((response) => {
         return response.text();        
     });
@@ -96,6 +88,34 @@ app.post('/login', (req, res, next) => {
     });
   })
 
+  app.get('/register', (req, res, next) => {
+    let session = req.session;
+    query('SELECT * FROM transaction_session WHERE session_value=?', [session.id])
+    .then((results) => {
+        if (results.length > 0) {
+            // logged in
+            res.redirect('/');
+        } else {
+            res.sendFile('html/register.html', {root:__dirname});
+        }
+    });
+  })
+
+  app.post('/register', (req, res, next) => {
+    let session = req.session;
+    query('SELECT UUID() AS uuid')
+    .then((results) => {
+        exec('INSERT INTO master_user VALUES (?, ?, ?, ?, MD5(?), ?, "A", SYSDATE())', [results[0].uuid, req.body.userName, req.body.userEmail, req.body.userPhone, req.body.userPassword, req.body.userId])
+        .then((response) => {
+            exec('INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())', [results[0].uuid, session.id])
+            .then((response) => {
+                res.redirect('/');     
+            });
+        });
+    });
+
+  })
+
 app.get('/sijkt-callback', (req, res, next) => {
     let session = req.session;
     get("User", "token", `token=${base64.decode(req.query.t)}`)
@@ -131,7 +151,7 @@ app.get('/sijkt-callback', (req, res, next) => {
                                 });
                             });
                         } else {
-                            res.send('Access denied, <a href="/login">login</a>');
+                            res.send(`Access denied, <a href="/login">login</a> | <a href="/register?t=${req.query.t}">register</a>`);
                         }
                     });
                 }

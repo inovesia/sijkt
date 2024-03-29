@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>SIJKT - Express Example</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/register.js"></script>
+  <script src="js/base64.js"></script>
+</head>
+
+<body class="hold-transition">
+    <form action="/register" method="post">
+        <table>
+            <tr>
+                <td>Email</td>
+                <td><input type="text" id="userEmail" name="userEmail" required></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" id="userName" name="userName" required></td>
+            </tr>
+            <tr>
+                <td>Phone</td>
+                <td><input type="text" id="userPhone" name="userPhone" required></td>
+            </tr>
+            <tr>
+                <td>NIP</td>
+                <td><input type="text" id="userNip" name="userNip" required></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" id="userPassword" name="userPassword" required></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" id="userPasswordRetype" name="userPasswordRetype" required></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="hidden" id="userId" name="userId">
+                    <input type="submit" name="submit" value="Register">
+                    <input id="login" type="button" name="login" value="Login">
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

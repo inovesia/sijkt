@@ -2,7 +2,7 @@
 
 This sample code require node.js 16
 
-### app.js
+### js/common.js
 Change SIJKT SSO url matching `staging` or `production` server
 ```
     const SIJKT_URL = "https://sijkt.inovesia.co.id/api";
@@ -16,7 +16,6 @@ Change SIJKT SSO url matching `staging` or `production` server
 ```
 Match MYSQL with your database parameters
 
-### js/app.js
 Change `APPLICATION_NUMBER` and `APPLICAION_KEY` with yours from SIJKT Partner portal
 ```
     const SIJKT_URL = "https://sijkt.inovesia.co.id/sso";
