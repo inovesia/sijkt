@@ -13,6 +13,7 @@ CREATE TABLE `master_user` (
   `user_phone` varchar(20) DEFAULT NULL,
   `user_password` char(36) DEFAULT NULL,
   `user_sijkt` char(36) DEFAULT NULL,
+  `user_revoked` datetime DEFAULT NULL,
   `user_status` char(2) DEFAULT NULL,
   `user_timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`user_id`)
