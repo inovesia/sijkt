@@ -1,5 +1,5 @@
-const SIJKT_API_URL = "https://sijkt.inovesia.co.id/api";
-const SIJKT_SSO_URL = "https://sijkt.inovesia.co.id/sso";
+const SIJKT_API_URL = "https://sijkt.pu.go.id/api";
+const SIJKT_SSO_URL = "https://sijkt.pu.go.id/sso";
 const SIJKT_NUMBER = "APPLICATION_NUMBER";
 const SIJKT_KEY = "APPLICAION_KEY";
 

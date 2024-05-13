@@ -42,12 +42,24 @@ let get = async (module, action, query) => {
     });
 }
 
+let revoke = async (userId) => {
+    return fetch(`${common.SIJKT_API_URL}/User/revoke?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${base64.encode(`${common.SIJKT_NUMBER}:${common.SIJKT_KEY}`)}`
+        },
+    })
+    .then((response) => {
+        return response.text();        
+    });
+}
+
 app.get('/', (req, res) => {
     let session = req.session;
     query('SELECT * FROM transaction_session INNER JOIN master_user ON session_user_id=user_id WHERE session_value=?', [session.id])
     .then((results) => {
         if (results.length > 0) {
-            res.send(`Welcome <b>${results[0].user_name}</b>, <a href="/logout">logout</a>`);
+            res.send(`Welcome <b>${results[0].user_name}</b>, <a href="/logout">logout</a> | <a href="/revoke?userId=${results[0].user_sijkt}">revoke</a>`);
         } else {
             res.redirect('/login');
         }
@@ -58,6 +70,19 @@ app.get('/logout', (req, res) => {
     let session = req.session;
     session.destroy()
     res.redirect('/');
+  })
+
+  app.get('/revoke', (req, res) => {
+    let session = req.session;
+    revoke(req.query.userId)
+    .then((response) => {
+        console.log('revoke: '+response);
+        exec('UPDATE master_user SET user_sijkt=NULL WHERE user_sijkt=?', [req.query.userId])
+        .then((response) => {
+            session.destroy()
+            res.redirect('/');
+        });
+    });
   })
 
 app.get('/login', (req, res, next) => {
@@ -143,6 +168,7 @@ app.get('/sijkt-callback', (req, res, next) => {
                                 // grant user to app
                                 get("User", "grant", `token=${base64.decode(req.query.t)}`)
                                 .then((response) => {
+                                    console.log('grant: '+response);
                                 });
                                 // start a new session
                                 exec('INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())', [user.user_id, session.id])
@@ -161,6 +187,18 @@ app.get('/sijkt-callback', (req, res, next) => {
         }
     })
   })
+
+  app.get('/sijkt-revoke', (req, res, next) => {
+    if (req.headers.authorization == `Bearer TjMxcDkzdXFGeDFDQXFWOQ==`) {
+        console.log('authorized');
+        exec('UPDATE master_user SET user_sijkt=NULL WHERE user_sijkt=?', [req.query.userId])
+        .then((response) => {
+            res.send('revoked');
+        });
+    } else {
+        res.send('not authorized');
+    }
+  });
 
 app.listen(port, () => {
   console.log(`SIJKT Example App listening on port ${port}`)
