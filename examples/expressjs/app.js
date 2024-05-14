@@ -152,7 +152,7 @@ app.get('/sijkt-callback', (req, res, next) => {
         response = JSON.parse(response);
         if (response.errorCode == 0) {
             // check if userId is mapped to table master_user column user_sijkt
-            query('SELECT * FROM master_user WHERE user_sijkt=?', [response.payload.userId])
+            query('SELECT * FROM master_user WHERE user_sijkt=? AND user_revoked IS NULL', [response.payload.userId])
             .then((results) => {
                 if (results.length > 0) {
                     // userId is mapped, start a new session
@@ -162,12 +162,12 @@ app.get('/sijkt-callback', (req, res, next) => {
                     });
                 } else if (response.payload.userEmail) {
                     // check userEmail is exists on table master_user column user_email
-                    query('SELECT * FROM master_user WHERE user_email=?', [response.payload.userEmail])
+                    query('SELECT * FROM master_user WHERE user_email=? AND user_revoked IS NULL', [response.payload.userEmail])
                     .then((results) => {
                         if (results.length > 0) {
                             let user = results[0];
                             // map userId to user_sijkt
-                            exec('UPDATE master_user SET user_sijkt=? WHERE user_email=?', [response.payload.userId, response.payload.userEmail])
+                            exec('UPDATE master_user SET user_sijkt=? WHERE user_email=? AND user_revoked IS NULL', [response.payload.userId, response.payload.userEmail])
                             .then((response) => {
                                 // grant user to app
                                 get("User", "grant", `token=${base64.decode(req.query.t)}`)
@@ -195,7 +195,7 @@ app.get('/sijkt-callback', (req, res, next) => {
   app.get('/sijkt-revoke', (req, res, next) => {
     if (req.headers.authorization == `Bearer TjMxcDkzdXFGeDFDQXFWOQ==`) {
         console.log('authorized');
-        exec('UPDATE master_user SET user_sijkt=NULL WHERE user_sijkt=?', [req.query.userId])
+        exec('UPDATE master_user SET user_sijkt=NULL WHERE user_sijkt=? AND user_revoked IS NULL', [req.query.userId])
         .then((response) => {
             res.send('revoked');
         });
