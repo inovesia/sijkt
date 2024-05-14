@@ -130,15 +130,19 @@ app.post('/login', (req, res, next) => {
     let session = req.session;
     query('SELECT UUID() AS uuid')
     .then((results) => {
-        exec('INSERT INTO master_user VALUES (?, ?, ?, ?, MD5(?), ?, "A", SYSDATE())', [results[0].uuid, req.body.userName, req.body.userEmail, req.body.userPhone, req.body.userPassword, req.body.userId])
+        exec('INSERT INTO master_user VALUES (?, ?, ?, ?, MD5(?), ?, NULL, "A", SYSDATE())', [results[0].uuid, req.body.userName, req.body.userEmail, req.body.userPhone, req.body.userPassword, req.body.userId])
         .then((response) => {
-            exec('INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())', [results[0].uuid, session.id])
+            // grant user to app
+            get("User", "grant", `token=${base64.decode(req.body.t)}`)
             .then((response) => {
-                res.redirect('/');     
-            });
+                console.log(response);
+                exec('INSERT INTO transaction_session VALUES (UUID(), ?, ?, SYSDATE())', [results[0].uuid, session.id])
+                .then((response) => {
+                    res.redirect('/');     
+                });
+            });                        
         });
     });
-
   })
 
 app.get('/sijkt-callback', (req, res, next) => {
